@@ -1,28 +1,43 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { connect } from 'react-redux';
+
+import HomePage from './components/HomePage';
+import EmployeePage from './components/EmployeePage';
+import { AppContainer, MainArea } from './styles/App.styles';
+import { simpleAction } from './actions/simpleAction';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+    };
+  }
+
+  testAction = (event) => {
+    this.props.simpleAction();
+  }
+
   render() {
+    const { employees } = this.props;
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <AppContainer className="App">
+        <MainArea>
+          <HomePage employees={employees} />
+          <EmployeePage />
+        </MainArea>
+      </AppContainer>
     );
   }
 }
 
-export default App;
+const mapStateToProps = state => ({
+  ...state
+});
+
+const mapDispatchToProps = dispatch => ({
+  simpleAction: () => dispatch(simpleAction())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
