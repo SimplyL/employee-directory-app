@@ -4,18 +4,33 @@ import { connect } from 'react-redux';
 import HomePage from './components/HomePage';
 import EmployeePage from './components/EmployeePage';
 import { AppContainer, MainArea } from './styles/App.styles';
-import { simpleAction } from './actions/simpleAction';
+import {
+  selectEmployee,
+  switchTab,
+  closeTab,
+  changeTitle,
+} from './actions/actionCreators';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
+  handleSelection = id => this.props.selectEmployee(id);
 
-    this.state = {
-    };
+  handleTabSwitch = id => this.props.switchTab(id);
+
+  handleTabClose = (evt, id) => {
+    evt.stopPropagation();
+    this.props.closeTab(id);
   }
 
-  testAction = (event) => {
-    this.props.simpleAction();
+  handleTitleChange = (id, value) => this.props.changeTitle(id, value);
+
+  getSelected = () => {
+    const { employees } = this.props;
+    return employees.find(employee => employee.isSelected && employee.isDisplayed);
+  }
+
+  getCurrentTabs = () => {
+    const { employees } = this.props;
+    return employees.filter(employee => employee.isSelected);
   }
 
   render() {
@@ -24,20 +39,27 @@ class App extends Component {
     return (
       <AppContainer className="App">
         <MainArea>
-          <HomePage employees={employees} />
-          <EmployeePage />
+          <HomePage employees={employees} onSelect={this.handleSelection} />
+          <EmployeePage
+            selectedEmployees={this.getCurrentTabs()}
+            employee={this.getSelected()}
+            onTabSwitch={this.handleTabSwitch}
+            onTabClose={this.handleTabClose}
+            onTitleChange={this.handleTitleChange}
+          />
         </MainArea>
       </AppContainer>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   ...state
 });
 
-const mapDispatchToProps = dispatch => ({
-  simpleAction: () => dispatch(simpleAction())
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps, {
+  selectEmployee,
+  switchTab,
+  closeTab,
+  changeTitle
+})(App);
